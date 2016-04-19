@@ -1,17 +1,30 @@
 > NOTE: The Openframe platform is in an early stage. The extension API may change significantly.
 
-# Openframe Extension Example
+# Openframe Extension
 
-A boilerplate example of an Openframe extension.
+A base module used to create extensions for Openframe.
 
 [Openframe](http://openframe.io) is an open source platform for displaying art. Frames running the [Openframe controller](https://github.com/OpenframeProject/Openframe) software can load extensions which add functionality.
 
 ## Developing an Extension
 
-A extension is simply a node module which exports an object containing a handful of predefined properties. Every extension must define an `init` function which is called by the frame controller after the extension has been installed, and is passed a reference to an OF object. The OF object provides the extension sandboxed access to the openframe system.
+A extension is simply a node module which exports an instance of this Extension class. The Extension class constructor takes a single argument, a properties object which must define an `init` function or a `format` description object (or both). If a `format` description property is provided, the Extension will add the defined format type to the frame. The `init` function is called by the frame controller after the extension has been installed.
 
 ```javascript
 ...
+
+
+module.exports = new Extension({
+    init: function() {
+        // The extension has access to the global pubsub module as
+        // this.pubsub
+
+        // And an authenticated instance of the rest API client
+        // this.rest
+
+        // And
+    }
+});
 
 extension.init = function(OF) {
     // do your extension dance
@@ -50,27 +63,37 @@ A FORMAT extension, not surprisingly, adds a new artwork 'format'. Conceptually,
 
 Each artwork specifies exactly one format, and each frame can support any number of formats.
 
-FORMAT extensions should call the addFormat method on the OF object, passing a 'format' object which defines the details of the format.
+FORMAT extensions should define a 'format' object which defines the details of the format.
 
 ```javascript
 ...
 
-// in the extension.init function...
-
-OF.addFormat(
-    {
-        // what is this format called?
-        'name': 'openframe-extensionexample',
-        // what is the display name? (not currently used, but maybe a good idea)
-        'display_name': 'Openframe Example Extension',
-        // does the artwork need to be downloaded in order to run?
+module.exports = new Extension({
+    format: {
+        // the name should be the same as the npm package name
+        'name': pjson.name,
+        // displayed to the user, perhaps?
+        'display_name': 'Shader',
+        // does this type of artwork need to be downloaded to the frame?
         'download': true,
-        // how should the artwork be initiated?
-        'start_command': 'echo "starting $filepath"',
-        // how should the artwork be halted?
-        'end_command': 'echo "stopping"'
+        // how do start this type of artwork? currently two token replacements, $filepath and $url
+        'start_command': function(config) {
+            debug('Artwork config: ', config);
+            var command = 'glslViewer';
+            config = config || {};
+            if (config.w) {
+                command += ' -w ' + config.w;
+            }
+            if (config.h) {
+                command += ' -h ' + config.h;
+            }
+            command += ' $filepath';
+            return command;
+        },
+        // how do we stop this type of artwork?
+        'end_command': 'pkill glslViewer'
     }
-);
+});
 
 ...
 ```
