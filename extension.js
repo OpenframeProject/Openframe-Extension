@@ -1,14 +1,18 @@
 var pjson = require('./package.json'),
     debug = require('debug')('openframe:baseextension'),
-    Extension = module.exports;
+    Extension;
 
-
-Extension = function(props) {
+/**
+ * Extension class.
+ *
+ * @param {Object} props User-defined properties of the extension.
+ */
+module.exports = Extension = function(props) {
     this.props = props;
     this._initialized = false;
 
-    if (!this.props.init) {
-        throw new Error('Extensions must define an init method.');
+    if (!this.props.init && !this.props.format) {
+        throw new Error('Extensions must define an init method or a format definition object.');
     }
 };
 
@@ -20,5 +24,15 @@ Extension.prototype._init = function(OF) {
     this.pubsub = OF.getPubsub();
     this.rest = OF.getRest();
 
-    this.props.init();
+    // if the extension props contains a format, add it
+    if (this.props.format) {
+        OF.addFormat(this.props.format);
+    }
+
+    // if the extension props define an init method, call it
+    if (typeof this.props.init === 'function') {
+        this.props.init.call(this, OF);
+    }
+
+    this._initialized = true;
 };

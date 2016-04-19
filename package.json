@@ -1,7 +1,7 @@
 {
-  "name": "openframe-baseextension",
+  "name": "openframe-extension",
   "version": "0.1.0",
-  "description": "Base extension module.",
+  "description": "Base Openframe Extension module.",
   "main": "extension.js",
   "scripts": {
     "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha"
