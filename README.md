@@ -8,62 +8,25 @@ A base module used to create extensions for Openframe.
 
 ## Developing an Extension
 
-A extension is simply a node module which exports an instance of this Extension class. The Extension class constructor takes a single argument, a properties object which must define an `init` function or a `format` description object (or both). If a `format` description property is provided, the Extension will add the defined format type to the frame. The `init` function is called by the frame controller after the extension has been installed.
+A extension is simply a node module which exports an instance of this Extension class. The Extension class constructor takes a single argument, a properties object which can be used to specify the extension's functionality.
+
+The Extension class provides instance properties which give access to the REST API client (`this.rest`), the global event system (`this.pubsub`), and the frame model object (`this.frame`).
 
 ```javascript
 ...
 
-
-module.exports = new Extension({
-    init: function() {
-        // The extension has access to the global pubsub module as
-        // this.pubsub
-
-        // And an authenticated instance of the rest API client
-        // this.rest
-
-        // And
-    }
-});
-
-extension.init = function(OF) {
-    // do your extension dance
-
-    // Add a new format, see below
-    // OF.addFormat(...)
-
-    // The OF provides access to the current Frame model module. From this object you can access and modify
-    // the current frame state directly (frame.state, a serializable js object), persist it to the local disk or
-    // save it to the server, etc. Look at frame.js in the Openframe repo for details.
-    var frame = OF.getFrame();
-
-    // The OF provides access to the global pubsub system:
-    var pubsub = OF.getPubsub();
-    pubsub.publish('some/event', {msg: 'something happened!'});
-    pubsub.subscribe('frame/' + frame.state.id + '/updated', function() {
-        debug('frame has updated!');
-    });
-
-    // Finally, extensions are given access to an authenticated REST client (swagger):
-    // https://github.com/swagger-api/swagger-js
-    // TODO: provide example usage
-    var swaggerClient = OF.getRest();
-}
+module.exports = new Extension({});
 
 ...
 ```
 
-### Extension Types
+### Adding support for a new artwork format
 
-Though the structure is identical, extensions can be considered to be one of two types: A 'FORMAT' extension or a 'FRAME' extension.
+An extension can add support for a new artwork 'format'. Conceptually, a format can be thought of as the 'media type' of the artwork, e.g. 'an image' or 'a shader'. A format defines how the frame controller should start and stop an artwork of its media type, and installs any dependencies that the media type needs in order to run.
 
-#### FORMAT extensions
+Each artwork specifies exactly one format, and each frame can support any number of formats. Artworks can specify a config object which formats can use when determining how to display the artwork.
 
-A FORMAT extension, not surprisingly, adds a new artwork 'format'. Conceptually, a format can be thought of as the 'media type' of the artwork, e.g. 'an image' or 'a shader'. A format defines how the frame controller should start and stop an artwork of its media type, and installs any dependencies that the media type needs in order to run.
-
-Each artwork specifies exactly one format, and each frame can support any number of formats.
-
-FORMAT extensions should define a 'format' object which defines the details of the format.
+To add a format, define a `format` property on the extension properties object:
 
 ```javascript
 ...
@@ -98,33 +61,35 @@ module.exports = new Extension({
 ...
 ```
 
-For an example a FORMAT extension, see [Openframe-glslViewer](https://github.com/OpenframeProject/Openframe-glslViewer).
+For an example a format extension, see [Openframe-glslViewer](https://github.com/OpenframeProject/Openframe-glslViewer).
 
-#### FRAME extensions
+### Adding hardware extensions to the frame
 
-A FRAME extension adds functionality to the frame itself. FRAME extensions might be used to interact with the frame hardware, for example allowing for a custom input device to be used via gpio. In other cases, a FRAME extension might add functionality that interacts directly with artworks, for example by sending OSC messages.
+An extension can also add functionality to the frame itself. Extensions might be used to interact with the frame hardware, for example allowing for a custom input device to be used via GPIO. In other cases, an extension might add functionality that interacts directly with artworks, for example by sending OSC messages.
 
 ```javascript
 ...
+
 var gpio = require('onoff').Gpio;
 
-// called after install has completed
-extension.init = function(OF) {
-    // maybe add a button?
-    var pubsub = OF.getPubsub(),
-        button = new gpio(17, 'in', 'both');
+module.exports = new Extension({
+    init: function() {
 
-    // when the button changes, publish an event
-    button.watch(function(err, state) {
-        if (err) debug(err);
-        pubsub.publish('/openframe-gpio/17', state);
-    });
-}
+        var button = new gpio(17, 'in', 'both'),    // add a button via GPIO
+            pubsub = this.pubsub;                   // access to the global event system
+
+        // when the button changes, publish an event
+        button.watch(function(err, state) {
+            if (err) debug(err);
+            pubsub.publish('/openframe-gpio/17', state);
+        });
+    }
+});
 
 ...
 ```
 
-For an example a FRAME extension, ~~see [Openframe-GPIO](https://github.com/OpenframeProject/Openframe-GPIO)~~ (we need to update this to the most recent extension structure).
+For an example frame extension, ~~see [Openframe-GPIO](https://github.com/jmwohl/Openframe-GPIO)~~ (we need to update this to the most recent extension structure).
 
 ### Installing dependencies
 
