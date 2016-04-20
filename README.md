@@ -8,7 +8,7 @@ A base module used to create extensions for Openframe.
 
 ## Developing an Extension
 
-A extension is simply a node module which exports an instance of this Extension class. The Extension class constructor takes a single argument, a properties object which can be used to specify the extension's functionality.
+An extension is simply a node module which exports an instance of this Extension class. The Extension class constructor takes a single argument, a properties object which can be used to specify the extension's functionality.
 
 The Extension class provides instance properties which give access to the REST API client (`this.rest`), the global event system (`this.pubsub`), and the frame model object (`this.frame`).
 
