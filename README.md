@@ -8,14 +8,16 @@ A base module used to create extensions for Openframe.
 
 ## Developing an Extension
 
-An extension is simply a node module which exports an instance of this Extension class. The Extension class constructor takes a single argument, a properties object which can be used to specify the extension's functionality.
+An extension is simply a node module which exports an instance of the Extension class. The Extension class constructor takes a single argument, a properties object which can be used to specify the extension's functionality.
 
 The Extension class provides instance properties which give access to the REST API client (`this.rest`), the global event system (`this.pubsub`), and the frame model object (`this.frame`).
 
 ```javascript
 ...
 
-module.exports = new Extension({});
+module.exports = new Extension({
+    // props
+});
 
 ...
 ```
@@ -25,6 +27,8 @@ module.exports = new Extension({});
 An extension can add support for a new artwork 'format'. Conceptually, a format can be thought of as the 'media type' of the artwork, e.g. 'an image' or 'a shader'. A format defines how the frame controller should start and stop an artwork of its media type, and installs any dependencies that the media type needs in order to run.
 
 Each artwork specifies exactly one format, and each frame can support any number of formats. Artworks can specify a config object which formats can use when determining how to display the artwork.
+
+Each extension can define a single format.
 
 To add a format, define a `format` property on the extension properties object:
 
@@ -36,30 +40,54 @@ module.exports = new Extension({
         // the name should be the same as the npm package name
         'name': pjson.name,
         // displayed to the user, perhaps?
-        'display_name': 'Shader',
+        'display_name': 'Image',
         // does this type of artwork need to be downloaded to the frame?
         'download': true,
         // how do start this type of artwork? currently two token replacements, $filepath and $url
         'start_command': function(config) {
             debug('Artwork config: ', config);
-            var command = 'glslViewer';
+            var command = 'image-player';
             config = config || {};
-            if (config.w) {
-                command += ' -w ' + config.w;
-            }
-            if (config.h) {
-                command += ' -h ' + config.h;
+            if (config.display_mode) {
+                switch (config.display_mode) {
+                    case 'contain':
+                        command += ' --contain';
+                        break;
+                    case 'cover':
+                        command += ' --cover';
+                        break;
+                }
             }
             command += ' $filepath';
             return command;
         },
         // how do we stop this type of artwork?
-        'end_command': 'pkill glslViewer'
+        'end_command': 'pkill image-player'
     }
 });
 
 ...
 ```
+
+#### The format definition object
+
+To define a format, we need to specify five values:
+
+**name** {String}
+A unique format name used by artworks to specify this format. We *highly* recommend using the npm package name in order to enforce uniqueness. E.g. 'openframe-glslviewer'
+
+**display_name** {String}
+A human-friendly name for the format, e.g. 'Shader'
+
+**download** {Boolean}
+Does the artwork need to be downloaded in order to run?
+
+**start_command** {String | Function}
+A string command or function returning a string command which will be executed when starting an artwork. If a function, it will be passed a config object optionally defined on the artwork being started. The output command can contain two tokens, '$filepath' and '$url', which will be replaced by their respective values.
+
+**end_command** {String}
+A string command executed when stopping an artwork.
+
 
 For an example a format extension, see [Openframe-glslViewer](https://github.com/OpenframeProject/Openframe-glslViewer).
 

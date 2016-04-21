@@ -1,5 +1,5 @@
 var pjson = require('./package.json'),
-    debug = require('debug')('openframe:baseextension'),
+    debug = require('debug')('openframe:extension'),
     Extension;
 
 /**
@@ -9,6 +9,9 @@ var pjson = require('./package.json'),
  */
 module.exports = Extension = function(props) {
     this.props = props;
+    // this.frame = null;
+    // this.pubsub = null;
+    // this.rest = null;
     this._initialized = false;
 
     if (!this.props.init && !this.props.format) {
