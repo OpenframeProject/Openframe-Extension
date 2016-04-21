@@ -1,6 +1,4 @@
-var pjson = require('./package.json'),
-    debug = require('debug')('openframe:extension'),
-    Extension;
+var Extension;
 
 /**
  * Extension class.
@@ -21,7 +19,9 @@ module.exports = Extension = function(props) {
 
 // Called by the frame controller
 Extension.prototype._init = function(OF) {
-    if (this._initialized) return;
+    if (this._initialized) {
+        return;
+    }
 
     this.frame = OF.getFrame();
     this.pubsub = OF.getPubsub();
