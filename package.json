@@ -4,7 +4,8 @@
   "description": "Base Openframe Extension module.",
   "main": "extension.js",
   "scripts": {
-    "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha"
+    "lint": "./node_modules/.bin/eslint extension.js",
+    "test": "npm run lint && ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha"
   },
   "keywords": [
     "openframe"
@@ -12,6 +13,7 @@
   "author": "Jonathan Wohl",
   "license": "GPL-3.0",
   "devDependencies": {
+    "eslint": "^2.8.0",
     "istanbul": "^0.4.2",
     "mocha": "^2.3.4",
     "sinon": "^1.17.2"
