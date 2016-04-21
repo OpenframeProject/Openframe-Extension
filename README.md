@@ -1,5 +1,7 @@
 > NOTE: The Openframe platform is in an early stage. The extension API may change significantly.
 
+[![Build Status](https://travis-ci.org/OpenframeProject/Openframe-Extension.svg?branch=master)](https://travis-ci.org/OpenframeProject/Openframe-Extension)
+
 # Openframe Extension
 
 A base module used to create extensions for Openframe.
@@ -117,7 +119,7 @@ module.exports = new Extension({
 ...
 ```
 
-For an example frame extension, ~~see [Openframe-GPIO](https://github.com/jmwohl/Openframe-GPIO)~~ (we need to update this to the most recent extension structure).
+For an example frame extension, ~~see [Openframe-GPIOExample](https://github.com/jmwohl/Openframe-GPIO)~~ (we need to update this to the most recent extension structure).
 
 ### Installing dependencies
 
