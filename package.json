@@ -5,7 +5,8 @@
   "main": "extension.js",
   "scripts": {
     "lint": "./node_modules/.bin/eslint extension.js",
-    "test": "npm run lint && ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha"
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "test": "npm run lint && ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && npm run coveralls"
   },
   "keywords": [
     "openframe"
@@ -13,6 +14,7 @@
   "author": "Jonathan Wohl",
   "license": "GPL-3.0",
   "devDependencies": {
+    "coveralls": "^2.11.9",
     "eslint": "^2.8.0",
     "istanbul": "^0.4.2",
     "mocha": "^2.3.4",
