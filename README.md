@@ -1,8 +1,6 @@
-> NOTE: The Openframe platform is in an early stage. The extension API may change significantly.
-
-[![Build Status](https://travis-ci.org/OpenframeProject/Openframe-Extension.svg?branch=master)](https://travis-ci.org/OpenframeProject/Openframe-Extension)
-
 # Openframe Extension
+
+[![Build Status](https://travis-ci.org/OpenframeProject/Openframe-Extension.svg?branch=master)](https://travis-ci.org/OpenframeProject/Openframe-Extension) [![Coverage Status](https://coveralls.io/repos/github/OpenframeProject/Openframe-Extension/badge.svg?branch=master)](https://coveralls.io/github/OpenframeProject/Openframe-Extension?branch=master)
 
 A base module used to create extensions for Openframe.
 
