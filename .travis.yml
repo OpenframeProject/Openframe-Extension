@@ -3,15 +3,8 @@ node_js:
   - "4"
   - "5"
 
-branches:
-  only:
-    - master
-
 notifications:
   slack: openframeproject:wGLUMLh5CTAIOGsPUSU8eMf3
-
-before_script:
-  - npm run lint
 
 script:
   - npm run test-coveralls
