@@ -88,4 +88,3 @@ describe('format', function() {
         assert(OF.addFormat.called);
     });
 });
-
